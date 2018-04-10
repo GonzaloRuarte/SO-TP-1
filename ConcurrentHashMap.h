@@ -1,11 +1,14 @@
 #include "ListaAtomica.hpp"
 #include <utility>
 #include <iostream>
+#include <semaphore.h>
 
 using namespace std;
 class ConcurrentHashMap {
 	private:
 		Lista<pair<string,int> > table[26];
+
+		sem_t* semaforosAddAndInt[26];
 	public:
 		ConcurrentHashMap();
 		

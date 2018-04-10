@@ -3,16 +3,31 @@
 #include <pthread.h>
 
 ConcurrentHashMap::ConcurrentHashMap() {
-	/*for(uint i = 0; i < 26; i++){
-		hashMap[i] = Lista();
-	}*/
+	for(uint i = 0; i < 26; i++){
+		sem_init(semaforosAddAndInt[i],0,1);
+
+	}
 }
 
-void addAndInc(string key) {
+void ConcurrentHashMap::addAndInc(string key) {
+	int index = (key[0]-(int)'a'); //le restamos 'a' para que empiece de 0
+
+	sem_wait(semaforosAddAndInt[index]);
+	Lista<pair<string,int> >::Iterador it = table[index].CrearIt();
+	while(it.HaySiguiente() && it.Siguiente().first!=key){
+		it.Avanzar();
+	}
+
+	if(it.HaySiguiente() && it.Siguiente().first==key){
+		it.Siguiente().second++;
+	}else{
+		table[index].push_front(make_pair(key,1));
+	}
+	sem_post(semaforosAddAndInt[index]);
 
 }
 
-bool member(string key) {
+bool ConcurrentHashMap::member(string key) {
 
 }
 /*
@@ -26,7 +41,7 @@ void procesarFila(void *mod){
 	pthread_exit(NULL);
 }*/
 
-pair<string, int> maximum(unsigned int nt){
+pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	/*pthread_t thread[nt];
 	int tid;
 	int cantFilas = 26 div nt; //intervalo, por ej si nt es 4, el thread 2 procesa la fila 2, la 6, la 10, etc.
