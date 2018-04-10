@@ -16,6 +16,15 @@ all: $(BIN)
 
 $(BIN): ListaAtomica.hpp
 
+main: main.cpp $(OBJ) 
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+ConcurrentHashMap: ConcurrentHashMap.cpp ListaAtomica.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
+ListaAtomica: ListaAtomica.hpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(LDLIBS)
+
 test-2: $(OBJ) test-2.cpp
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ test-2.cpp $(OBJ) $(LDLIBS)
 	
