@@ -5,8 +5,8 @@
 ConcurrentHashMap::ConcurrentHashMap() {
 	for(uint i = 0; i < 26; i++){
 		sem_init(semaforosAddAndInt[i],0,1);
-
 	}
+	sem_init(semaforoIsWriting,0,1);
 }
 
 void ConcurrentHashMap::addAndInc(string key) {
@@ -28,7 +28,23 @@ void ConcurrentHashMap::addAndInc(string key) {
 }
 
 bool ConcurrentHashMap::member(string key) {
+	int index = (key[0]-(int)'a'); //le restamos 'a' para que empiece de 0
 
+
+///// Copy paste de la teorica de SWMR
+	Lista<pair<string,int> >::Iterador it = table[index].CrearIt();
+	while(it.HaySiguiente() && it.Siguiente().first!=key){
+		it.Avanzar();
+	}
+	bool member;
+	if(it.HaySiguiente() && it.Siguiente().first==key){
+		member=true; 
+	}else{
+		member=false;
+	}
+///// Copy paste de la teorica de SWMR
+
+	return member;
 }
 /*
 void procesarFila(void *mod){

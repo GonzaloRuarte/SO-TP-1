@@ -9,6 +9,8 @@ class ConcurrentHashMap {
 		Lista<pair<string,int> > table[26];
 
 		sem_t* semaforosAddAndInt[26];
+
+		sem_t* semaforoIsWriting;
 	public:
 		ConcurrentHashMap();
 		
