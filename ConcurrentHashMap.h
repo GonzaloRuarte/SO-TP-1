@@ -10,7 +10,6 @@ class ConcurrentHashMap {
 
 		sem_t* semaforosAddAndInt[26];
 
-		sem_t* semaforoIsWriting;
 	public:
 		ConcurrentHashMap();
 		
