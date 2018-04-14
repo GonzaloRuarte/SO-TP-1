@@ -43,32 +43,52 @@ bool ConcurrentHashMap::member(string key) {
 
 	return member;
 }
-/*
-void procesarFila(void *mod){
-	pair <pair <int,int*>,int> par = *((pair <pair <int,int*>,int> *) mod); //notar que casteo el long como puntero a int
-	int* max = mod.first.second;
-	for (int i = mod.second; i < 26; i+=par.first){
-		//recorrer lista, bla bla y poner *max = lo que corresponda;
+
+pair<string, int>  max_pair(pair<string, int>  a, pair<string, int>  b ){
+	return a.second>b.second?a:b;
+}
+
+void ConcurrentHashMap::procesarFila(void *mod){
+	ConcurrentHashMap::threadArguments * args = ((ConcurrentHashMap::threadArguments *)mod);
+	pair<string, int> * max = args->max;
+	max->second=0;
+	for (int i = args->filaInicial; i < 26 ; i+=args->intervalo){
+
+			//SECCION CRITICA
+			Lista<pair<string,int> >::Iterador it = table[i].CrearIt();
+			while(it.HaySiguiente()){
+				*max=max_pair(*max,it.Siguiente());
+
+				it.Avanzar();
+			}
+			//SECCION CRITICA
 		
 	}
 	pthread_exit(NULL);
-}*/
+}
+
 
 pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
-	/*pthread_t thread[nt];
+	pthread_t thread[nt];
 	int tid;
-	int cantFilas = 26 div nt; //intervalo, por ej si nt es 4, el thread 2 procesa la fila 2, la 6, la 10, etc.
-	int retValues[nt]; //arreglo con los valores de retorno de cada thread
-	par< <int,long>, int > args[nt]; //arreglo con los argumentos que le voy a pasar a cada thread, el intervalo, la fila inicial y un puntero al arreglo retValues, uso long porque las direcciones son de 64 bits
+	int cantFilas =  div(26,nt).quot; //intervalo, por ej si nt es 4, el thread 2 procesa la fila 2, la 6, la 10, etc.
+	pair<string, int> retValues[nt]; //arreglo con los valores de retorno de cada thread
+	ConcurrentHashMap::threadArguments argAPasar[nt]; //arreglo con los argumentos que le voy a pasar a cada thread, el intervalo, la fila inicial y un puntero al arreglo retValues, uso long porque las direcciones son de 64 bits
 	for (tid = 0; tid < nt; ++tid) { //creo nt threads
-		argAPasar[tid].first.first = cantFilas; //intervalo
-		argAPasar[tid].second = nt; //fila inicial
-		argAPasar[tid].first.second = &(retValues[tid]); //puntero
-		pthread_create(&thread[tid], NULL, procesarFila, &argAPasar[tid]);
+		argAPasar[tid].intervalo = cantFilas; //intervalo
+		argAPasar[tid].filaInicial = nt*cantFilas; //fila inicial
+		argAPasar[tid].max = &(retValues[tid]); //puntero
+		pthread_create(&thread[tid], NULL, procesarFila, &(argAPasar[tid]));
 	}
 
 	for (tid = 0; tid < nt; ++tid){
 		pthread_join(thread[tid], NULL);
-	}*/
+	}
+	pair<string, int> max =retValues[0];
+	for (tid = 1; tid < nt; ++tid){
+		max=max_pair(max,retValues[tid]);
+	}
+
+	return max;
 
 }

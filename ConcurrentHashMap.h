@@ -10,6 +10,14 @@ class ConcurrentHashMap {
 
 		sem_t* semaforosAddAndInt[26];
 
+		typedef struct {
+			int intervalo;
+			int filaInicial;
+			pair<string, int> * max;
+		} threadArguments;
+		
+		void procesarFila(void *mod);
+
 	public:
 		ConcurrentHashMap();
 		
@@ -18,5 +26,7 @@ class ConcurrentHashMap {
 		bool member(string key);
 		
 		pair<string, int> maximum(unsigned int nt);
+
+
 	
 };
