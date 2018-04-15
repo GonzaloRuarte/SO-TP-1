@@ -6,19 +6,13 @@
 using namespace std;
 class ConcurrentHashMap {
 	private:
-		Lista<pair<string,int> > table[26];
 
 		sem_t* semaforosAddAndInt[26];
 
-		typedef struct {
-			int intervalo;
-			int filaInicial;
-			pair<string, int> * max;
-		} threadArguments;
-		
-		void procesarFila(void *mod);
 
 	public:
+		Lista<pair<string,int> > tabla[26];
+
 		ConcurrentHashMap();
 		
 		void addAndInc(string key);
@@ -27,6 +21,12 @@ class ConcurrentHashMap {
 		
 		pair<string, int> maximum(unsigned int nt);
 
+		typedef struct {
+			int intervalo;
+			int filaInicial;
+			pair<string, int> * max;
+			Lista<pair<string,int> >* list;
+		} threadArguments;
 
 	
 };

@@ -13,7 +13,7 @@ void ConcurrentHashMap::addAndInc(string key) {
 
 	sem_wait(semaforosAddAndInt[index]);
 	//SECCION CRITICA
-	Lista<pair<string,int> >::Iterador it = table[index].CrearIt();
+	Lista<pair<string,int> >::Iterador it = tabla[index].CrearIt();
 	while(it.HaySiguiente() && it.Siguiente().first!=key){
 		it.Avanzar();
 	}
@@ -21,7 +21,7 @@ void ConcurrentHashMap::addAndInc(string key) {
 	if(it.HaySiguiente() && it.Siguiente().first==key){
 		it.Siguiente().second++;
 	}else{
-		table[index].push_front(make_pair(key,1));
+		tabla[index].push_front(make_pair(key,1));
 	}
 	//SECCION CRITICA
 	sem_post(semaforosAddAndInt[index]);
@@ -33,7 +33,7 @@ bool ConcurrentHashMap::member(string key) {
 
 	sem_wait(semaforosAddAndInt[index]);
 	//SECCION CRITICA
-	Lista<pair<string,int> >::Iterador it = table[index].CrearIt();
+	Lista<pair<string,int> >::Iterador it = tabla[index].CrearIt();
 	while(it.HaySiguiente() && it.Siguiente().first!=key){
 		it.Avanzar();
 	}
@@ -48,14 +48,15 @@ pair<string, int>  max_pair(pair<string, int>  a, pair<string, int>  b ){
 	return a.second>b.second?a:b;
 }
 
-void ConcurrentHashMap::procesarFila(void *mod){
+
+void * procesarFila(void *mod) {
 	ConcurrentHashMap::threadArguments * args = ((ConcurrentHashMap::threadArguments *)mod);
 	pair<string, int> * max = args->max;
 	max->second=0;
 	for (int i = args->filaInicial; i < 26 ; i+=args->intervalo){
 
 			//SECCION CRITICA
-			Lista<pair<string,int> >::Iterador it = table[i].CrearIt();
+			Lista<pair<string,int> >::Iterador it = args->list->CrearIt();
 			while(it.HaySiguiente()){
 				*max=max_pair(*max,it.Siguiente());
 
@@ -77,8 +78,10 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	for (tid = 0; tid < nt; ++tid) { //creo nt threads
 		argAPasar[tid].intervalo = cantFilas; //intervalo
 		argAPasar[tid].filaInicial = nt*cantFilas; //fila inicial
-		argAPasar[tid].max = &(retValues[tid]); //puntero
-		pthread_create(&thread[tid], NULL, procesarFila, &(argAPasar[tid]));
+		argAPasar[tid].max = &(retValues[tid]); //puntero al maximo
+		argAPasar[tid].list = &(tabla[tid]); //puntero a la lista
+
+		pthread_create(&thread[tid], NULL, procesarFila, &argAPasar[tid]);
 	}
 
 	for (tid = 0; tid < nt; ++tid){
@@ -92,3 +95,4 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	return max;
 
 }
+

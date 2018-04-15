@@ -19,9 +19,9 @@ $(BIN): ListaAtomica.hpp
 main: main.cpp $(OBJ) 
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-ConcurrentHashMap: ConcurrentHashMap.cpp ListaAtomica.o
+ConcurrentHashMap: ListaAtomica.o ConcurrentHashMap.cpp
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
-
+ 
 ListaAtomica: ListaAtomica.hpp
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(LDLIBS)
 
