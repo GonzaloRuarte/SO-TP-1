@@ -4,6 +4,7 @@
 
 ConcurrentHashMap::ConcurrentHashMap() {
 	for(uint i = 0; i < 26; i++){
+		semaforosAddAndInt[i] = new sem_t();
 		sem_init(semaforosAddAndInt[i],0,1);
 	}
 }
@@ -11,6 +12,7 @@ ConcurrentHashMap::ConcurrentHashMap() {
 void ConcurrentHashMap::addAndInc(string key) {
 	int index = (key[0]-(int)'a'); //le restamos 'a' para que empiece de 0
 
+	max_mutex.lock();
 	sem_wait(semaforosAddAndInt[index]);
 	//SECCION CRITICA
 	Lista<pair<string,int> >::Iterador it = tabla[index].CrearIt();
@@ -25,6 +27,7 @@ void ConcurrentHashMap::addAndInc(string key) {
 	}
 	//SECCION CRITICA
 	sem_post(semaforosAddAndInt[index]);
+	max_mutex.unlock();
 
 }
 
@@ -72,6 +75,7 @@ void * procesarFila(void *mod) {
 pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	pthread_t thread[nt];
 	int tid;
+	max_mutex.lock();
 	int cantFilas =  div(26,nt).quot; //intervalo, por ej si nt es 4, el thread 2 procesa la fila 2, la 6, la 10, etc.
 	pair<string, int> retValues[nt]; //arreglo con los valores de retorno de cada thread
 	ConcurrentHashMap::threadArguments argAPasar[nt]; //arreglo con los argumentos que le voy a pasar a cada thread, el intervalo, la fila inicial y un puntero al arreglo retValues, uso long porque las direcciones son de 64 bits
@@ -87,6 +91,8 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	for (tid = 0; tid < nt; ++tid){
 		pthread_join(thread[tid], NULL);
 	}
+	
+	max_mutex.unlock();
 	pair<string, int> max =retValues[0];
 	for (tid = 1; tid < nt; ++tid){
 		max=max_pair(max,retValues[tid]);

@@ -2,12 +2,14 @@
 #include <utility>
 #include <iostream>
 #include <semaphore.h>
+#include <mutex>
 
 using namespace std;
 class ConcurrentHashMap {
 	private:
 
 		sem_t* semaforosAddAndInt[26];
+		mutex max_mutex;
 
 
 	public:
