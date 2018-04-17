@@ -16,7 +16,7 @@ class ConcurrentHashMap {
 		Lista<pair<string,int> > tabla[26];
 
 		ConcurrentHashMap();
-		
+
 		void addAndInc(string key);
 		
 		bool member(string key);

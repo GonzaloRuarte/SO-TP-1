@@ -1,5 +1,4 @@
 #include "ConcurrentHashMap.h"
-
 #include <pthread.h>
 
 ConcurrentHashMap::ConcurrentHashMap() {
@@ -8,6 +7,8 @@ ConcurrentHashMap::ConcurrentHashMap() {
 		sem_init(semaforosAddAndInt[i],0,1);
 	}
 }
+
+
 
 void ConcurrentHashMap::addAndInc(string key) {
 	int index = (key[0]-(int)'a'); //le restamos 'a' para que empiece de 0
