@@ -4,27 +4,24 @@
 
 using namespace std;
 
-void count_words(string arch,ConcurrentHashMap* h){
+ConcurrentHashMap* count_words(string arch){
+	ConcurrentHashMap* h = new ConcurrentHashMap();
 	ifstream entrada(arch);
 	string word;
+
 	while(entrada >> word){
-		cout << word <<endl;
 		h->addAndInc(word);
 	}
 
-	
-
+	return h;
 }
-
-
 
 
 int main(int argc, char * argv[]) {
 
 	if (argc == 2) {
 		string file = argv[1];
-		ConcurrentHashMap* h = new ConcurrentHashMap();
-		count_words(file,h);
+		ConcurrentHashMap* h = count_words(file);
 		for (uint i = 0; i < 26; i++) {
 			for (auto it = h->tabla[i].CrearIt(); it.HaySiguiente(); it.Avanzar()) {
 				auto t = it.Siguiente();
