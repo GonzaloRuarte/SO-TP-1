@@ -72,6 +72,8 @@ int main(int argc, char * argv[]) {
 				cout << t.first << " " << t.second << endl;
 			}
 		}
+		cout << h.maximum(5).first << endl;
+		cout << h.maximum(5).second << endl;
 	}
 	return 0;
 }

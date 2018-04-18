@@ -77,11 +77,12 @@ pair<string, int>  max_pair(pair<string, int>  a, pair<string, int>  b ){
 void * procesarFila(void *mod) {
 	ConcurrentHashMap::threadArguments* args = ((ConcurrentHashMap::threadArguments *)mod);
 	pair<string, int>* max = args->max;
+	Lista<pair<string,int> >* dirTabla = args->dirTabla;
 	max->second=0;
 	for (int i = args->filaInicial; i < 26 ; i+=args->intervalo){
 
 			//SECCION CRITICA
-			Lista<pair<string,int> >::Iterador it = args->list->CrearIt();
+			Lista<pair<string,int> >::Iterador it = args->dirTabla[i].CrearIt();
 			while(it.HaySiguiente()){
 				*max=max_pair(*max,it.Siguiente());
 
@@ -113,7 +114,7 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 		argAPasar[tid].intervalo = nt; //intervalo
 		argAPasar[tid].filaInicial = tid; //fila inicial
 		argAPasar[tid].max = &(retValues[tid]); //puntero al maximo
-		argAPasar[tid].list = &(tabla[tid]); //puntero a la lista
+		argAPasar[tid].dirTabla = &(tabla[0]); //puntero a la lista
 
 		pthread_create(&thread[tid], NULL, procesarFila, &argAPasar[tid]);
 	}
@@ -192,13 +193,12 @@ ConcurrentHashMap* ConcurrentHashMap::count_words(list<string> archs) {
 	ConcurrentHashMap* h = new ConcurrentHashMap();
 	int nt = archs.size();
 	pthread_t threads[nt];
-	int tid;
-
+	int tid = 0;
+	sCountWords2 argAPasar[nt];
 	for (std::list<string>::iterator it=archs.begin(); it != archs.end(); ++it) {
-		sCountWords2* argAPasar;
-		argAPasar->archivo = *it;
-		argAPasar->h = h;
-		pthread_create(&threads[tid], NULL, procesarTextoCount2, argAPasar);
+		argAPasar[tid].archivo = *it;
+		argAPasar[tid].h = h;
+		pthread_create(&threads[tid], NULL, procesarTextoCount2, &argAPasar[tid]);
 
 		++tid;
 	}

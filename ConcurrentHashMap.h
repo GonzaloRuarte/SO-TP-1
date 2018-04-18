@@ -43,7 +43,7 @@ class ConcurrentHashMap {
 			int intervalo;
 			int filaInicial;
 			pair<string, int> * max;
-			Lista<pair<string,int> >* list;
+			Lista<pair<string,int> >*  dirTabla;
 		} threadArguments;
 
 	
