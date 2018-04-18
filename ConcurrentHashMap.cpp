@@ -225,12 +225,12 @@ ConcurrentHashMap* ConcurrentHashMap::count_words(unsigned int n, list<string> a
 			for (int i = 0; i < n; ++i) {
 				if (threadsLibres[i] == 1) {
 					hayThreadLibre = true;
+					threadsLibres[i] = 0;
 					tid = i;
 					break;
 				}
 			}
 		}
-		cout << "1" << endl;
 		//hay thread libre, lo pongo a correr
 		argAPasar[tid].archivo = *it;
 		argAPasar[tid].h = h;
