@@ -6,6 +6,14 @@ ConcurrentHashMap::ConcurrentHashMap() {
 		semaforosAddAndInt[i] = new sem_t();
 		sem_init(semaforosAddAndInt[i],0,1);
 	}
+	maximumSem = new sem_t();
+	sem_init(maximumSem,0,1);
+	addInc = new sem_t();
+	sem_init(addInc,0,1);
+	fair = new sem_t();
+	sem_init(fair,0,1);
+	maxCount = 0;
+	addCount = 0;
 }
 
 
@@ -13,7 +21,13 @@ ConcurrentHashMap::ConcurrentHashMap() {
 void ConcurrentHashMap::addAndInc(string key) {
 	int index = (key[0]-(int)'a'); //le restamos 'a' para que empiece de 0
 
-	max_mutex.lock();
+	sem_wait(fair);
+	sem_wait(addInc);
+	addCount++;
+	if(addCount == 1){sem_wait(maximumSem);}
+	sem_post(addInc);
+	sem_post(fair);
+
 	sem_wait(semaforosAddAndInt[index]);
 	//SECCION CRITICA
 	Lista<pair<string,int> >::Iterador it = tabla[index].CrearIt();
@@ -27,8 +41,15 @@ void ConcurrentHashMap::addAndInc(string key) {
 		tabla[index].push_front(make_pair(key,1));
 	}
 	//SECCION CRITICA
+	
 	sem_post(semaforosAddAndInt[index]);
-	max_mutex.unlock();
+
+	sem_wait(addInc);
+	addCount--;
+	if(addCount == 0){sem_post(maximumSem);}
+	sem_post(addInc);
+
+
 
 }
 
@@ -76,7 +97,15 @@ void * procesarFila(void *mod) {
 pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	pthread_t thread[nt];
 	int tid;
-	max_mutex.lock();
+	
+	sem_wait(fair);
+	sem_wait(maximumSem);
+	maxCount++;
+	if(maxCount == 1){sem_wait(addInc);}
+	sem_post(maximumSem);
+	sem_post(fair);
+
+
 	int cantFilas =  div(26,nt).quot; //intervalo, por ej si nt es 4, el thread 2 procesa la fila 2, la 6, la 10, etc.
 	pair<string, int> retValues[nt]; //arreglo con los valores de retorno de cada thread
 	ConcurrentHashMap::threadArguments argAPasar[nt]; //arreglo con los argumentos que le voy a pasar a cada thread, el intervalo, la fila inicial y un puntero al arreglo retValues, uso long porque las direcciones son de 64 bits
@@ -93,7 +122,12 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 		pthread_join(thread[tid], NULL);
 	}
 	
-	max_mutex.unlock();
+	
+	sem_wait(maximumSem);
+	maxCount--;
+	if(maxCount == 0){sem_post(addInc);}
+	sem_post(maximumSem);
+
 	pair<string, int> max =retValues[0];
 	for (tid = 1; tid < nt; ++tid){
 		max=max_pair(max,retValues[tid]);

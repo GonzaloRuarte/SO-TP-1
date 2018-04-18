@@ -13,6 +13,12 @@ class ConcurrentHashMap {
 		sem_t* semaforosAddAndInt[26];
 		mutex max_mutex;
 
+		sem_t* addInc;
+		sem_t* maximumSem;
+		sem_t* fair;
+
+		uint maxCount;
+		uint addCount;
 
 	public:
 		Lista<pair<string,int> > tabla[26];
