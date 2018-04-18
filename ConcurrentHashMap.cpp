@@ -155,7 +155,6 @@ typedef struct {
 void count_words_aux(string arch, ConcurrentHashMap* h) {
 	ifstream entrada(arch);
 	string word;
-
 	while(entrada >> word){
 		h->addAndInc(word);
 	}
@@ -164,6 +163,7 @@ void count_words_aux(string arch, ConcurrentHashMap* h) {
 void* procesarTextoCount2(void* mod) {
 	sCountWords2* args = (sCountWords2*) mod;
 	count_words_aux(args->archivo, args->h);
+	pthread_exit(NULL);
 }
 
 void* procesarTextoCount3(void* mod) {

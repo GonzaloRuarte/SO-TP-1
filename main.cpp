@@ -13,7 +13,7 @@ void test2() {
 
 void test3() {
 	//TODO: el pthread_create da seg fault, todavia no se por que
-	list<string> l = {"corpus-0", "corpus-1", "corpus-2", "corpus-3", "corpus-4"};
+	list<string> l = {"corpus", "corpus", "corpus", "corpus", "corpus"};
 	ConcurrentHashMap* h = ConcurrentHashMap::count_words(l);
 	ConcurrentHashMap::printConcurrentHashMap(h);
 	delete h;
