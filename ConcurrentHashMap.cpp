@@ -54,8 +54,8 @@ pair<string, int>  max_pair(pair<string, int>  a, pair<string, int>  b ){
 
 
 void * procesarFila(void *mod) {
-	ConcurrentHashMap::threadArguments * args = ((ConcurrentHashMap::threadArguments *)mod);
-	pair<string, int> * max = args->max;
+	ConcurrentHashMap::threadArguments* args = ((ConcurrentHashMap::threadArguments *)mod);
+	pair<string, int>* max = args->max;
 	max->second=0;
 	for (int i = args->filaInicial; i < 26 ; i+=args->intervalo){
 
@@ -81,8 +81,8 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 	pair<string, int> retValues[nt]; //arreglo con los valores de retorno de cada thread
 	ConcurrentHashMap::threadArguments argAPasar[nt]; //arreglo con los argumentos que le voy a pasar a cada thread, el intervalo, la fila inicial y un puntero al arreglo retValues, uso long porque las direcciones son de 64 bits
 	for (tid = 0; tid < nt; ++tid) { //creo nt threads
-		argAPasar[tid].intervalo = cantFilas; //intervalo
-		argAPasar[tid].filaInicial = nt*cantFilas; //fila inicial
+		argAPasar[tid].intervalo = nt; //intervalo
+		argAPasar[tid].filaInicial = tid; //fila inicial
 		argAPasar[tid].max = &(retValues[tid]); //puntero al maximo
 		argAPasar[tid].list = &(tabla[tid]); //puntero a la lista
 
@@ -103,3 +103,116 @@ pair<string, int> ConcurrentHashMap::maximum(unsigned int nt){
 
 }
 
+
+//STRUCTS
+typedef struct {
+	string archivo;
+	ConcurrentHashMap* h;
+} sCountWords2;
+
+typedef struct {
+	string archivo;
+	ConcurrentHashMap* h;
+	int* returnStatus; //arranca en 0, cuando termina el thread lo pone en 1
+} sCountWords3;
+
+//FUNCIONES AUXILIARES
+void count_words_aux(string arch, ConcurrentHashMap* h) {
+	ifstream entrada(arch);
+	string word;
+
+	while(entrada >> word){
+		h->addAndInc(word);
+	}
+}
+
+void* procesarTextoCount2(void* mod) {
+	sCountWords2* args = (sCountWords2*) mod;
+	count_words_aux(args->archivo, args->h);
+}
+
+void* procesarTextoCount3(void* mod) {
+	sCountWords3* args = (sCountWords3*) mod;
+	count_words_aux(args->archivo, args->h);
+	*(args->returnStatus) = 1;
+}
+
+void ConcurrentHashMap::printConcurrentHashMap(ConcurrentHashMap* h) {
+	for (uint i = 0; i < 26; i++) {
+		for (auto it = h->tabla[i].CrearIt(); it.HaySiguiente(); it.Avanzar()) {
+			auto t = it.Siguiente();
+			cout << t.first << " " << t.second << endl;
+		}
+	}
+}
+
+
+//FUNCIONES
+ConcurrentHashMap* ConcurrentHashMap::count_words(string arch) {
+	ConcurrentHashMap* h = new ConcurrentHashMap();
+	count_words_aux(arch, h);
+	return h;
+}
+
+ConcurrentHashMap* ConcurrentHashMap::count_words(list<string> archs) {
+	ConcurrentHashMap* h = new ConcurrentHashMap();
+	int nt = archs.size();
+	pthread_t threads[nt];
+	int tid;
+
+	for (std::list<string>::iterator it=archs.begin(); it != archs.end(); ++it) {
+		sCountWords2* argAPasar;
+		argAPasar->archivo = *it;
+		argAPasar->h = h;
+		pthread_create(&threads[tid], NULL, procesarTextoCount2, argAPasar);
+
+		++tid;
+	}
+
+	for (tid = 0; tid < nt; ++tid){
+		pthread_join(threads[tid], NULL);
+	}
+
+	return h;
+}
+
+ConcurrentHashMap* count_words(unsigned int n, list<string> archs) {
+	ConcurrentHashMap* h = new ConcurrentHashMap();
+	pthread_t threads[n];
+	int threadsLibres[n];
+	std::fill_n(threadsLibres, n, 1); //lo lleno todo de 1, porque al principio todos son libres
+
+	for (std::list<string>::iterator it=archs.begin(); it != archs.end(); ++it) {
+		//busco thread libre
+		bool hayThreadLibre = false;
+		int tid;
+		while (!hayThreadLibre) {
+			for (int i = 0; i < n; ++i) {
+				if (threadsLibres[i] == 1) {
+					hayThreadLibre = true;
+					tid = i;
+					break;
+				}
+			}
+		}
+
+		//hay thread libre, lo pongo a correr
+		sCountWords3* argAPasar;
+		argAPasar->archivo = *it;
+		argAPasar->h = h;
+		argAPasar->returnStatus = &threadsLibres[tid];
+		pthread_create(&threads[tid], NULL, procesarTextoCount3, argAPasar);
+
+		++it;
+	}
+
+	for (int i = 0; i < n; ++i) {
+		pthread_join(threads[i], NULL);
+	}
+
+	return h;
+}
+
+pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maximos, list<string> archs) {
+
+}

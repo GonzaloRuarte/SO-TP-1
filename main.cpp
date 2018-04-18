@@ -1,35 +1,60 @@
 #include <iostream>
 #include "ConcurrentHashMap.h"
 #include <fstream>
+#include <list>
 
 using namespace std;
 
-ConcurrentHashMap* count_words(string arch){
-	ConcurrentHashMap* h = new ConcurrentHashMap();
-	ifstream entrada(arch);
-	string word;
+void test2() {
+	ConcurrentHashMap* h = ConcurrentHashMap::count_words("corpus");
+	ConcurrentHashMap::printConcurrentHashMap(h);
+	delete h;
+}
 
-	while(entrada >> word){
-		h->addAndInc(word);
-	}
+void test3() {
+	//TODO: el pthread_create da seg fault, todavia no se por que
+	list<string> l = {"corpus-0", "corpus-1", "corpus-2", "corpus-3", "corpus-4"};
+	ConcurrentHashMap* h = ConcurrentHashMap::count_words(l);
+	ConcurrentHashMap::printConcurrentHashMap(h);
+	delete h;
+}
 
-	return h;
+void test4() {
+	//TODO: este count words no se esta linkeando
+
+	//list<string> l = {"corpus-0", "corpus-1", "corpus-2", "corpus-3", "corpus-4"};
+	//ConcurrentHashMap* h = ConcurrentHashMap::count_words(3, l);
+	//ConcurrentHashMap::printConcurrentHashMap(h);
+	//delete h;
+}
+
+void test5() {
+
 }
 
 
 int main(int argc, char * argv[]) {
 
 	if (argc == 2) {
-		string file = argv[1];
-		ConcurrentHashMap* h = count_words(file);
-		for (uint i = 0; i < 26; i++) {
-			for (auto it = h->tabla[i].CrearIt(); it.HaySiguiente(); it.Avanzar()) {
-				auto t = it.Siguiente();
-				cout << t.first << " " << t.second << endl;
-			}
+		ConcurrentHashMap* h;
+		char test = *argv[1];
+		
+		if (test == '2') {
+			test2();
 		}
-		delete h;
-	} else if (argc ==1) {
+
+		if (test == '3') {
+			test3();
+		}
+
+		if (test == '4') {
+			test4();
+		}
+
+		if (test == '5') {	
+			test5();
+		}
+	} else if (argc == 1) {
 		ConcurrentHashMap h;
 		int i,j;
 
