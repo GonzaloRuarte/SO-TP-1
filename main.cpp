@@ -22,10 +22,10 @@ void test3() {
 void test4() {
 	//TODO: este count words no se esta linkeando
 
-	//list<string> l = {"corpus-0", "corpus-1", "corpus-2", "corpus-3", "corpus-4"};
-	//ConcurrentHashMap* h = ConcurrentHashMap::count_words(3, l);
-	//ConcurrentHashMap::printConcurrentHashMap(h);
-	//delete h;
+	list<string> l = {"corpus", "corpus", "corpus", "corpus", "corpus"};
+	ConcurrentHashMap* h = ConcurrentHashMap::count_words(3, l);
+	ConcurrentHashMap::printConcurrentHashMap(h);
+	delete h;
 }
 
 void test5() {

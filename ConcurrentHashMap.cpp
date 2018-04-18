@@ -170,6 +170,7 @@ void* procesarTextoCount3(void* mod) {
 	sCountWords3* args = (sCountWords3*) mod;
 	count_words_aux(args->archivo, args->h);
 	*(args->returnStatus) = 1;
+	pthread_exit(NULL);
 }
 
 void ConcurrentHashMap::printConcurrentHashMap(ConcurrentHashMap* h) {
@@ -210,12 +211,12 @@ ConcurrentHashMap* ConcurrentHashMap::count_words(list<string> archs) {
 	return h;
 }
 
-ConcurrentHashMap* count_words(unsigned int n, list<string> archs) {
+ConcurrentHashMap* ConcurrentHashMap::count_words(unsigned int n, list<string> archs) {
 	ConcurrentHashMap* h = new ConcurrentHashMap();
 	pthread_t threads[n];
 	int threadsLibres[n];
 	std::fill_n(threadsLibres, n, 1); //lo lleno todo de 1, porque al principio todos son libres
-
+	sCountWords3 argAPasar[n];
 	for (std::list<string>::iterator it=archs.begin(); it != archs.end(); ++it) {
 		//busco thread libre
 		bool hayThreadLibre = false;
@@ -229,15 +230,13 @@ ConcurrentHashMap* count_words(unsigned int n, list<string> archs) {
 				}
 			}
 		}
-
+		cout << "1" << endl;
 		//hay thread libre, lo pongo a correr
-		sCountWords3* argAPasar;
-		argAPasar->archivo = *it;
-		argAPasar->h = h;
-		argAPasar->returnStatus = &threadsLibres[tid];
-		pthread_create(&threads[tid], NULL, procesarTextoCount3, argAPasar);
-
-		++it;
+		argAPasar[tid].archivo = *it;
+		argAPasar[tid].h = h;
+		argAPasar[tid].returnStatus = &threadsLibres[tid];
+		pthread_create(&threads[tid], NULL, procesarTextoCount3, &argAPasar[tid]);
+		
 	}
 
 	for (int i = 0; i < n; ++i) {
