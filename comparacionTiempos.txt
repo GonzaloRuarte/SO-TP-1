@@ -1,6 +1,0 @@
-El count_words de 1 thread - 1 archivo tomo tiempo promedio: 7721996
-El count_words de 1 threads tomo tiempo promedio: 11918605
-El count_words de 2 threads tomo tiempo promedio: 9491466
-El count_words de 3 threads tomo tiempo promedio: 8097997
-El count_words de 4 threads tomo tiempo promedio: 8181729
-El count_words de 5 threads tomo tiempo promedio: 7151162

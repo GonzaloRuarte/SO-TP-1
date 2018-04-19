@@ -1,6 +1,0 @@
-El count_words de 1 thread - 1 archivo tomo tiempo min: 6276938
-El count_words de 1 threads tomo tiempo min: 10495152
-El count_words de 2 threads tomo tiempo min: 8419028
-El count_words de 3 threads tomo tiempo min: 7061876
-El count_words de 4 threads tomo tiempo min: 7659296
-El count_words de 5 threads tomo tiempo min: 6390662
