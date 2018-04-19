@@ -5,5 +5,5 @@ import datetime
 
 for i in range(0,50):
 	src_dir="corpus"
-	dst_dir="corpus" + str(i)
+	dst_dir="Corpuses/corpus" + str(i)
 	shutil.copy(src_dir,dst_dir)

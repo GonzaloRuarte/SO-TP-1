@@ -215,7 +215,9 @@ void* procesarTextoCount5(void* mod) {
 
 	for(int i = 0; i<26; ++i) {
 		for(auto it = h->tabla[i].CrearIt(); it.HaySiguiente(); it.Avanzar()) {
+			cout<<"intento addandinc"<<endl;
 			args->mergedH->addAndIncN(it.Siguiente().first, it.Siguiente().second);
+			cout<<"logre addandinc"<<endl;
 		}
 	}
 
@@ -277,6 +279,7 @@ ConcurrentHashMap* ConcurrentHashMap::count_words(unsigned int n, list<string> a
 					hayThreadLibre = true;
 					threadsLibres[i] = 0;
 					tid = i;
+					cout<<"asigno el thread"<<i<<endl;
 					break;
 				}
 			}
@@ -296,7 +299,7 @@ ConcurrentHashMap* ConcurrentHashMap::count_words(unsigned int n, list<string> a
 	return h;
 }
 
-pair<string, unsigned int> maximum5(unsigned int p_archivos, unsigned int p_maximos, list<string> archs) {
+pair<string, unsigned int> ConcurrentHashMap::maximum5(unsigned int p_archivos, unsigned int p_maximos, list<string> archs) {
 	ConcurrentHashMap* mergedH = new ConcurrentHashMap();
 	pthread_t threads[p_archivos];
 	int threadsLibres[p_archivos];
@@ -332,7 +335,7 @@ pair<string, unsigned int> maximum5(unsigned int p_archivos, unsigned int p_maxi
 	return maximo;
 }
 
-pair<string, unsigned int> maximum6(unsigned int p_archivos, unsigned int p_maximos, list<string> archs) {
+pair<string, unsigned int> ConcurrentHashMap::maximum6(unsigned int p_archivos, unsigned int p_maximos, list<string> archs) {
 	ConcurrentHashMap* h = ConcurrentHashMap::count_words(p_archivos, archs);
 	pair<string, unsigned int> maximo = h->maximum(p_maximos);
 	delete h;
