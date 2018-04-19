@@ -247,5 +247,38 @@ ConcurrentHashMap* ConcurrentHashMap::count_words(unsigned int n, list<string> a
 }
 
 pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maximos, list<string> archs) {
+	ConcurrentHashMap* h = new ConcurrentHashMap();
+	pthread_t threads[p_archivos];
+	int threadsLibres[p_archivos];
+	std::fill_n(threadsLibres, p_archivos, 1); //lo lleno todo de 1, porque al principio todos son libres
+	sCountWords3 argAPasar[p_archivos];
+	for (std::list<string>::iterator it=archs.begin(); it != archs.end(); ++it) {
+		//busco thread libre
+		bool hayThreadLibre = false;
+		int tid;
+		while (!hayThreadLibre) {
+			for (int i = 0; i < p_archivos; ++i) {
+				if (threadsLibres[i] == 1) {
+					hayThreadLibre = true;
+					threadsLibres[i] = 0;
+					tid = i;
+					break;
+				}
+			}
+		}
+		//hay thread libre, lo pongo a correr
+		argAPasar[tid].archivo = *it;
+		argAPasar[tid].h = h;
+		argAPasar[tid].returnStatus = &threadsLibres[tid];
+		pthread_create(&threads[tid], NULL, procesarTextoCount3, &argAPasar[tid]);
+		
+	}
 
+	for (int i = 0; i < p_archivos; ++i) {
+		pthread_join(threads[i], NULL);
+	}
+
+	pair<string, unsigned int> maximo = h->maximum(p_maximos);
+	delete h;
+	return maximo;
 }

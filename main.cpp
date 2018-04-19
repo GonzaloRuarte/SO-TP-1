@@ -2,8 +2,51 @@
 #include "ConcurrentHashMap.h"
 #include <fstream>
 #include <list>
+#include "rdtsc.h"
 
 using namespace std;
+
+
+void test1() {
+	ofstream txt("comparacionTiemposMinimo.txt");
+
+	list<string> l = {"corpus-0", "corpus-1", "corpus-2", "corpus-3", "corpus-4"};
+	unsigned long delta=1111111110;
+	for(int i=0;i<100;i++){
+		unsigned long start, end;
+		RDTSC_START(start);
+		ConcurrentHashMap* h = ConcurrentHashMap::count_words(l);
+		RDTSC_STOP(end);
+		delete h;
+		//delta += end - start;
+		delta = (end - start) < delta ? (end - start) : delta;
+		cout<<"vuelta "<<i<<" del 1-1"<<endl;
+	}
+	txt<<"El count_words de 1 thread - 1 archivo tomo tiempo min: "<<(delta)<<endl;
+	cout<<"ahora pasamos al siguiente pero primero probamos que onda..."<<endl;
+	ConcurrentHashMap* h = ConcurrentHashMap::count_words(1,l);
+	cout<<"ahora si probamos posta"<<endl;
+
+	delta=1111111110;
+
+	for(int j=1;j<6;j++){
+		cout<<"iteracion de "<<j<<"threads"<<endl;
+		delta=1111111110;
+		for(int i=0;i<100;i++){
+			unsigned long start, end;
+			RDTSC_START(start);
+			ConcurrentHashMap* h = ConcurrentHashMap::count_words(j,l);
+			RDTSC_STOP(end);
+			delete h;
+			//delta += end - start;
+			delta = (end - start) < delta ? (end - start) : delta;
+			cout<<"vuelta "<<i<<"del "<<j<<" threads"<<endl;
+		}
+		txt<<"El count_words de "<<j<<" threads tomo tiempo min: "<<(delta)<<endl;
+	}
+
+	txt.close();
+}
 
 void test2() {
 	ConcurrentHashMap* h = ConcurrentHashMap::count_words("corpus");
@@ -39,6 +82,10 @@ int main(int argc, char * argv[]) {
 		ConcurrentHashMap* h;
 		char test = *argv[1];
 		
+		if (test == '1') {
+			test1();
+		}
+
 		if (test == '2') {
 			test2();
 		}
