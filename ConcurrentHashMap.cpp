@@ -48,9 +48,38 @@ void ConcurrentHashMap::addAndInc(string key) {
 	addCount--;
 	if(addCount == 0){sem_post(maximumSem);}
 	sem_post(addInc);
+}
 
+void ConcurrentHashMap::addAndIncN(string key, int n) {
+	int index = (key[0]-(int)'a'); //le restamos 'a' para que empiece de 0
 
+	sem_wait(fair);
+	sem_wait(addInc);
+	addCount++;
+	if(addCount == 1){sem_wait(maximumSem);}
+	sem_post(addInc);
+	sem_post(fair);
 
+	sem_wait(semaforosAddAndInt[index]);
+	//SECCION CRITICA
+	Lista<pair<string,int> >::Iterador it = tabla[index].CrearIt();
+	while(it.HaySiguiente() && it.Siguiente().first!=key){
+		it.Avanzar();
+	}
+
+	if(it.HaySiguiente() && it.Siguiente().first==key){
+		it.Siguiente().second += n;
+	}else{
+		tabla[index].push_front(make_pair(key,1));
+	}
+	//SECCION CRITICA
+	
+	sem_post(semaforosAddAndInt[index]);
+
+	sem_wait(addInc);
+	addCount--;
+	if(addCount == 0){sem_post(maximumSem);}
+	sem_post(addInc);
 }
 
 bool ConcurrentHashMap::member(string key) {
@@ -151,6 +180,12 @@ typedef struct {
 	int* returnStatus; //arranca en 0, cuando termina el thread lo pone en 1
 } sCountWords3;
 
+typedef struct {
+	string archivo;
+	ConcurrentHashMap* mergedH;
+	int* returnStatus;
+} sCountWords5;
+
 //FUNCIONES AUXILIARES
 void count_words_aux(string arch, ConcurrentHashMap* h) {
 	ifstream entrada(arch);
@@ -169,6 +204,21 @@ void* procesarTextoCount2(void* mod) {
 void* procesarTextoCount3(void* mod) {
 	sCountWords3* args = (sCountWords3*) mod;
 	count_words_aux(args->archivo, args->h);
+	*(args->returnStatus) = 1;
+	pthread_exit(NULL);
+}
+
+void* procesarTextoCount5(void* mod) {
+	sCountWords5* args = (sCountWords5*) mod;
+	ConcurrentHashMap* h = new ConcurrentHashMap();
+	count_words_aux(args->archivo, h);
+
+	for(int i = 0; i<26; ++i) {
+		for(auto it = h->tabla[i].CrearIt(); it.HaySiguiente(); it.Avanzar()) {
+			args->mergedH->addAndIncN(it.Siguiente().first, it.Siguiente().second);
+		}
+	}
+
 	*(args->returnStatus) = 1;
 	pthread_exit(NULL);
 }
@@ -246,12 +296,12 @@ ConcurrentHashMap* ConcurrentHashMap::count_words(unsigned int n, list<string> a
 	return h;
 }
 
-pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maximos, list<string> archs) {
-	ConcurrentHashMap* h = new ConcurrentHashMap();
+pair<string, unsigned int> maximum5(unsigned int p_archivos, unsigned int p_maximos, list<string> archs) {
+	ConcurrentHashMap* mergedH = new ConcurrentHashMap();
 	pthread_t threads[p_archivos];
 	int threadsLibres[p_archivos];
 	std::fill_n(threadsLibres, p_archivos, 1); //lo lleno todo de 1, porque al principio todos son libres
-	sCountWords3 argAPasar[p_archivos];
+	sCountWords5 argAPasar[p_archivos];
 	for (std::list<string>::iterator it=archs.begin(); it != archs.end(); ++it) {
 		//busco thread libre
 		bool hayThreadLibre = false;
@@ -268,16 +318,22 @@ pair<string, unsigned int> maximum(unsigned int p_archivos, unsigned int p_maxim
 		}
 		//hay thread libre, lo pongo a correr
 		argAPasar[tid].archivo = *it;
-		argAPasar[tid].h = h;
+		argAPasar[tid].mergedH = mergedH;
 		argAPasar[tid].returnStatus = &threadsLibres[tid];
-		pthread_create(&threads[tid], NULL, procesarTextoCount3, &argAPasar[tid]);
-		
+		pthread_create(&threads[tid], NULL, procesarTextoCount5, &argAPasar[tid]);
 	}
 
 	for (int i = 0; i < p_archivos; ++i) {
 		pthread_join(threads[i], NULL);
 	}
 
+	pair<string, unsigned int> maximo = mergedH->maximum(p_maximos);
+	delete mergedH;
+	return maximo;
+}
+
+pair<string, unsigned int> maximum6(unsigned int p_archivos, unsigned int p_maximos, list<string> archs) {
+	ConcurrentHashMap* h = ConcurrentHashMap::count_words(p_archivos, archs);
 	pair<string, unsigned int> maximo = h->maximum(p_maximos);
 	delete h;
 	return maximo;
