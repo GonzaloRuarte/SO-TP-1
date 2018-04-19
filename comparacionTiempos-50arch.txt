@@ -1,8 +1,21 @@
-El count_words de 1 thread - 1 archivo tomo tiempo min: 6632840
-El count_words de 1 threads tomo tiempo min: 888099840
-El count_words de 2 threads tomo tiempo min: 481645282
-El count_words de 3 threads tomo tiempo min: 350265505
-El count_words de 4 threads tomo tiempo min: 264141992
-El count_words de 5 threads tomo tiempo min: 184801210
-El count_words de 6 threads tomo tiempo min: 140426343
-El count_words de 7 threads tomo tiempo min: 143099508
+El count_words de 1 thread - 1 archivo tomo tiempo min: 2435755
+El count_words de 1 threads tomo tiempo min: 375103129
+El count_words de 2 threads tomo tiempo min: 169075649
+El count_words de 3 threads tomo tiempo min: 112030188
+El count_words de 4 threads tomo tiempo min: 79021415
+El count_words de 5 threads tomo tiempo min: 40152139
+El count_words de 6 threads tomo tiempo min: 50370998
+El count_words de 7 threads tomo tiempo min: 11838888
+El count_words de 8 threads tomo tiempo min: 18194238
+El count_words de 9 threads tomo tiempo min: 17062476
+El count_words de 10 threads tomo tiempo min: 8819288
+El count_words de 11 threads tomo tiempo min: 6389906
+El count_words de 12 threads tomo tiempo min: 5722965
+El count_words de 13 threads tomo tiempo min: 9365482
+El count_words de 14 threads tomo tiempo min: 7519144
+El count_words de 15 threads tomo tiempo min: 7153380
+El count_words de 16 threads tomo tiempo min: 5152124
+El count_words de 17 threads tomo tiempo min: 9138606
+El count_words de 18 threads tomo tiempo min: 7834477
+El count_words de 19 threads tomo tiempo min: 5414513
+El count_words de 20 threads tomo tiempo min: 2681794

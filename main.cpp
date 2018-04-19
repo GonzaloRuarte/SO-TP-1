@@ -8,10 +8,10 @@ using namespace std;
 
 
 void test1() {
-	ofstream txt("comparacionTiempos-50arch.txt");
+	ofstream txt("comparacionTiempos-40Archs-30Threads.txt");
 
 	list<string> l ;
-	for(int i=0;i<50;i++){
+	for(int i=0;i<40;i++){
 		l.push_front("corpus" + to_string(i));
 	}
 	unsigned long delta=1111111110;
@@ -32,7 +32,7 @@ void test1() {
 
 	delta=1111111110;
 
-	for(int j=1;j<51;j++){
+	for(int j=1;j<31;j++){
 		cout<<"iteracion de "<<j<<"threads"<<endl;
 		delta=1111111110;
 		for(int i=0;i<100;i++){
