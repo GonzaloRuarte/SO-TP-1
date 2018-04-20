@@ -24,9 +24,6 @@ void testsCountWords1(int cantArch, int cantThreads,string salida ){
 		delta = (end - start) < delta ? (end - start) : delta;
 	}
 	txt<<(delta)<<endl;
-	ConcurrentHashMap* h = ConcurrentHashMap::count_words(1,l);
-
-	delta=1111111110;
 	txt.close();
 }
 
@@ -40,19 +37,18 @@ void testsCountWords2(int cantArch, int cantThreads,string salida ){
 	unsigned long delta=1111111110;
 	delta=1111111110;
 
-	for(int j=1;j<cantThreads;j++){
+	for(int j=1;j<=cantThreads;j++){
 		delta=1111111110;
 		for(int i=0;i<100;i++){
 			unsigned long start, end;
 			RDTSC_START(start);
 			ConcurrentHashMap* h = ConcurrentHashMap::count_words(j,l);
-			RDTSC_STOP(end);
+			RDTSC_STOP(end);			
 			delete h;
 			delta = (end - start) < delta ? (end - start) : delta;
 		}
 		txt<<j<<" "<<(delta)<<endl;
 	}
-
 	txt.close();
 }
 
@@ -117,12 +113,16 @@ void testsMaximum6(int cantArch, int cantThreads,string salida ){
 }
 
 void test2() {
-	testsCountWords2(40,30,"countWords2-40-30");
+	testsCountWords2(40,40,"countWords2-40-30");
 }
 
 void test3() {
 	//TODO: el pthread_create da seg fault, todavia no se por que
-	list<string> l = {"corpus-0", "corpus-1", "corpus-2", "corpus-3", "corpus-4"};
+	
+	list<string> l;
+	for(int i=0;i<40;i++){
+		l.push_front("Corpuses/corpus" + to_string(i));
+	}
 	ConcurrentHashMap* h = ConcurrentHashMap::count_words(l);
 	ConcurrentHashMap::printConcurrentHashMap(h);
 	delete h;
@@ -131,8 +131,11 @@ void test3() {
 void test4() {
 	//TODO: este count words no se esta linkeando
 
-	list<string> l = {"corpus-0", "corpus-1", "corpus-2", "corpus-3", "corpus-4"};
-	ConcurrentHashMap* h = ConcurrentHashMap::count_words(1, l);
+	list<string> l;
+	for(int i=0;i<40;i++){
+		l.push_front("Corpuses/corpus" + to_string(i));
+	}
+	ConcurrentHashMap* h = ConcurrentHashMap::count_words(20, l);
 	ConcurrentHashMap::printConcurrentHashMap(h);
 	delete h;
 }
