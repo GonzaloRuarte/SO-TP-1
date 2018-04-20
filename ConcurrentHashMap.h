@@ -5,6 +5,7 @@
 #include <mutex>
 #include <list>
 #include <fstream>
+#include <vector>
 
 using namespace std;
 class ConcurrentHashMap {
