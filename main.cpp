@@ -8,14 +8,14 @@ using namespace std;
 
 
 void test2() {
-	ConcurrentHashMap* h = ConcurrentHashMap::count_words("corpus");
+	ConcurrentHashMap* h = ConcurrentHashMap::count_words("Corpuses/corpus0");
 	ConcurrentHashMap::printConcurrentHashMap(h);
 	delete h;
 }
 
 void test3() {
 	//TODO: el pthread_create da seg fault, todavia no se por que
-	list<string> l = {"corpus-0", "corpus-1", "corpus-2", "corpus-3", "corpus-4"};
+	list<string> l = {"Corpuses/corpus0", "Corpuses/corpus1", "Corpuses/corpus2", "Corpuses/corpus3", "Corpuses/corpus4"};
 	ConcurrentHashMap* h = ConcurrentHashMap::count_words(l);
 	ConcurrentHashMap::printConcurrentHashMap(h);
 	delete h;
@@ -25,7 +25,7 @@ void test4() {
 	//TODO: este count words no se esta linkeando
 
 	list<string> l = {"corpus-0", "corpus-1", "corpus-2", "corpus-3", "corpus-4"};
-	ConcurrentHashMap* h = ConcurrentHashMap::count_words(1, l);
+	ConcurrentHashMap* h = ConcurrentHashMap::count_words(3, l);
 	ConcurrentHashMap::printConcurrentHashMap(h);
 	delete h;
 }
@@ -39,10 +39,10 @@ void testsCountWords(int cantArch, int cantThreads,string salida ){
 
 	list<string> l ;
 	for(int i=0;i<cantArch;i++){
-		l.push_front("corpus" + to_string(i));
+		l.push_front("Corpuses/corpus" + to_string(i));
 	}
 	unsigned long delta=1111111110;
-	for(int i=0;i<100;i++){
+	//for(int i=0;i<100;i++){
 		unsigned long start, end;
 		RDTSC_START(start);
 		ConcurrentHashMap* h = ConcurrentHashMap::count_words(l);
@@ -50,28 +50,26 @@ void testsCountWords(int cantArch, int cantThreads,string salida ){
 		delete h;
 		//delta += end - start;
 		delta = (end - start) < delta ? (end - start) : delta;
-		cout<<"vuelta "<<i<<" del 1-1"<<endl;
-	}
+		cout<<"vuelta "<<1<<" del 1-1"<<endl;
+	//}
 	txt<<"El count_words de 1 thread - 1 archivo tomo tiempo min: "<<(delta)<<endl;
-	cout<<"ahora pasamos al siguiente pero primero probamos que onda..."<<endl;
-	ConcurrentHashMap* h = ConcurrentHashMap::count_words(1,l);
-	cout<<"ahora si probamos posta"<<endl;
+
 
 	delta=1111111110;
 
 	for(int j=1;j<cantThreads;j++){
-		cout<<"iteracion de "<<j<<"threads"<<endl;
+		cout<<"iteracion de "<<j<<" threads"<<endl;
 		delta=1111111110;
-		for(int i=0;i<100;i++){
+		//for(int i=0;i<100;i++){
 			unsigned long start, end;
 			RDTSC_START(start);
-			ConcurrentHashMap* h = ConcurrentHashMap::count_words(j,l);
+			ConcurrentHashMap* h2 = ConcurrentHashMap::count_words(j,l);
 			RDTSC_STOP(end);
 			delete h;
 			//delta += end - start;
 			delta = (end - start) < delta ? (end - start) : delta;
-			cout<<"vuelta "<<i<<" del "<<j<<" threads"<<endl;
-		}
+			cout<<"vuelta "<<1<<" del "<<j<<" threads"<<endl;
+		//}
 		txt<<"El count_words de "<<j<<" threads tomo tiempo min: "<<(delta)<<endl;
 	}
 
@@ -80,7 +78,7 @@ void testsCountWords(int cantArch, int cantThreads,string salida ){
 
 
 void test1() {
-	testsCountWords(40,30,"test count_words 40 archivos 30threads");
+	testsCountWords(50,50,"test count_words 50 archivos 50 threads");
 }
 
 void testsMaximum(int cantArch, int cantThreads,string salida ){
@@ -88,7 +86,7 @@ void testsMaximum(int cantArch, int cantThreads,string salida ){
 
 	list<string> l ;
 	for(int i=0;i<cantArch;i++){
-		l.push_front("corpus" + to_string(i));
+		l.push_front("Corpuses/corpus" + to_string(i));
 	}
 	unsigned long delta=1111111110;
 	delta=1111111110;
@@ -133,7 +131,7 @@ void testsMaximum(int cantArch, int cantThreads,string salida ){
 }
 
 void test6() {
-	testsMaximum(40,30,"test maximum 40 archivos y 30 threads");
+	testsMaximum(50,50,"test maximum 50 archivos y 50 threads.txt");
 }
 
 int main(int argc, char * argv[]) {

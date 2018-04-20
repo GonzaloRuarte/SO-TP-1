@@ -178,6 +178,7 @@ typedef struct {
 	ConcurrentHashMap* h;
 	vector<string>* v;
 	atomic_int* archivoADesencolar;
+	int tid;
 } sCountWords3;
 
 typedef struct {
@@ -204,11 +205,19 @@ void* procesarTextoCount2(void* mod) {
 void* procesarTextoCount3(void* mod) {
 	sCountWords3* args = (sCountWords3*) mod;
 	int index =0;
-	while(index==args->v->size()){
+	cout<<"soy el thread "<<args->tid<<endl;
+	while(index<args->v->size()){
 		index=args->archivoADesencolar->fetch_add(1);
-		count_words_aux(args->v->at(index), args->h);
+		cout<<index<<" index"<<endl;
+		if(index<args->v->size()){
+			cout<<args->tid<<" procesa archivo "<<index<<endl;
+			count_words_aux(args->v->at(index), args->h);
+		}
 	}
+	cout<<"soy el thread "<<args->tid<<" y voy a mandar exit"<<endl;
 	pthread_exit(NULL);
+	cout<<"soy el thread "<<args->tid<<" y ya mande exit"<<endl;
+
 }
 
 void* procesarTextoCount5(void* mod) {
@@ -278,15 +287,19 @@ ConcurrentHashMap* ConcurrentHashMap::count_words(unsigned int n, list<string> a
 	sCountWords3 argAPasar[n];
 
 	for (int tid = 0; tid < n; ++tid) {
+		cout<<"cargo el thread "<<tid<<endl;
 		argAPasar[tid].h = h;
 		argAPasar[tid].v = &v;
 		argAPasar[tid].archivoADesencolar = &(archivoADesencolar);
+		argAPasar[tid].tid=tid;
 		pthread_create(&threads[tid], NULL, procesarTextoCount3, &argAPasar[tid]);
 		
 	}
 
 	for (int i = 0; i < n; ++i) {
+		cout<<"joineA EL: "<<i<<endl;
 		pthread_join(threads[i], NULL);
+		cout<<"joineA EL: "<<i<<endl;
 	}
 
 	return h;
