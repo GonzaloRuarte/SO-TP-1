@@ -20,6 +20,8 @@ class ConcurrentHashMap {
 		uint maxCount;
 		uint addCount;
 
+		atomic_int archivoADesencolar;
+
 	public:
 		Lista<pair<string,int> > tabla[26];
 

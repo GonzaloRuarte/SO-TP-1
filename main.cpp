@@ -93,6 +93,23 @@ void testsMaximum(int cantArch, int cantThreads,string salida ){
 	unsigned long delta=1111111110;
 	delta=1111111110;
 
+
+
+	for(int j=1;j<cantThreads+1;j++){
+		cout<<"iteracion de "<<j<<"threads maximum6"<<endl;
+		delta=1111111110;
+		for(int i=0;i<100;i++){
+			unsigned long start, end;
+			RDTSC_START(start);
+			ConcurrentHashMap::maximum6(j,cantArch,l);
+			RDTSC_STOP(end);			//delta += end - start;
+			delta = (end - start) < delta ? (end - start) : delta;
+			cout<<"vuelta "<<i<<" del "<<j<<" threads maximum6"<<endl;
+		}
+		txt<<"El maximum6 de "<<j<<" threads tomo tiempo min: "<<(delta)<<endl;
+	}
+
+
 	for(int j=1;j<cantThreads+1;j++){
 		cout<<"iteracion de "<<j<<"threads maximum5"<<endl;
 		delta=1111111110;
@@ -110,25 +127,13 @@ void testsMaximum(int cantArch, int cantThreads,string salida ){
 
 	delta=1111111110;
 
-	for(int j=1;j<cantThreads+1;j++){
-		cout<<"iteracion de "<<j<<"threads maximum6"<<endl;
-		delta=1111111110;
-		for(int i=0;i<100;i++){
-			unsigned long start, end;
-			RDTSC_START(start);
-			ConcurrentHashMap::maximum6(j,cantArch,l);
-			RDTSC_STOP(end);			//delta += end - start;
-			delta = (end - start) < delta ? (end - start) : delta;
-			cout<<"vuelta "<<i<<" del "<<j<<" threads maximum6"<<endl;
-		}
-		txt<<"El maximum6 de "<<j<<" threads tomo tiempo min: "<<(delta)<<endl;
-	}
+
 
 	txt.close();
 }
 
 void test6() {
-	testsMaximum(40,30,"test maximum 40 archivos y 30 threads");
+	testsMaximum(40,9,"test maximum 40 archivos y 30 threads");
 }
 
 int main(int argc, char * argv[]) {

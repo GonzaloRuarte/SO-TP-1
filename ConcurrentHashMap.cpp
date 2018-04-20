@@ -175,9 +175,9 @@ typedef struct {
 } sCountWords2;
 
 typedef struct {
-	string archivo;
 	ConcurrentHashMap* h;
-	int* returnStatus; //arranca en 0, cuando termina el thread lo pone en 1
+	vector<string>* v;
+	atomic_int* archivoADesencolar;
 } sCountWords3;
 
 typedef struct {
@@ -203,8 +203,10 @@ void* procesarTextoCount2(void* mod) {
 
 void* procesarTextoCount3(void* mod) {
 	sCountWords3* args = (sCountWords3*) mod;
+	while(args->archivoADesencolar->fetch_add(1)==args->v->size())
+
 	count_words_aux(args->archivo, args->h);
-	*(args->returnStatus) = 1;
+	
 	pthread_exit(NULL);
 }
 
@@ -265,29 +267,14 @@ ConcurrentHashMap* ConcurrentHashMap::count_words(list<string> archs) {
 
 ConcurrentHashMap* ConcurrentHashMap::count_words(unsigned int n, list<string> archs) {
 	ConcurrentHashMap* h = new ConcurrentHashMap();
+	vector<string> v{make_move_iterator(begin(archs)), make_move_iterator(end(archs))};
 	pthread_t threads[n];
-	int threadsLibres[n];
-	std::fill_n(threadsLibres, n, 1); //lo lleno todo de 1, porque al principio todos son libres
 	sCountWords3 argAPasar[n];
-	for (std::list<string>::iterator it=archs.begin(); it != archs.end(); ++it) {
-		//busco thread libre
-		bool hayThreadLibre = false;
-		int tid;
-		while (!hayThreadLibre) {
-			for (int i = 0; i < n; ++i) {
-				if (threadsLibres[i] == 1) {
-					hayThreadLibre = true;
-					threadsLibres[i] = 0;
-					tid = i;
-					cout<<"asigno el thread"<<i<<endl;
-					break;
-				}
-			}
-		}
-		//hay thread libre, lo pongo a correr
-		argAPasar[tid].archivo = *it;
+
+	for (int tid = 0; tid < n; ++tid) {
 		argAPasar[tid].h = h;
-		argAPasar[tid].returnStatus = &threadsLibres[tid];
+		argAPasar[tid].v = &v;
+		argAPasar[tid].archivoADesencolar = &(this->archivoADesencolar);
 		pthread_create(&threads[tid], NULL, procesarTextoCount3, &argAPasar[tid]);
 		
 	}
