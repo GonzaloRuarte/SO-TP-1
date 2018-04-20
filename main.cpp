@@ -39,7 +39,7 @@ void testsCountWords(int cantArch, int cantThreads,string salida ){
 
 	list<string> l ;
 	for(int i=0;i<cantArch;i++){
-		l.push_front("corpus" + to_string(i));
+		l.push_front("Corpuses/corpus" + to_string(i));
 	}
 	unsigned long delta=1111111110;
 	for(int i=0;i<100;i++){
@@ -88,7 +88,7 @@ void testsMaximum(int cantArch, int cantThreads,string salida ){
 
 	list<string> l ;
 	for(int i=0;i<cantArch;i++){
-		l.push_front("corpus" + to_string(i));
+		l.push_front("Corpuses/corpus" + to_string(i));
 	}
 	unsigned long delta=1111111110;
 	delta=1111111110;
@@ -133,7 +133,7 @@ void testsMaximum(int cantArch, int cantThreads,string salida ){
 }
 
 void test6() {
-	testsMaximum(40,9,"test maximum 40 archivos y 30 threads");
+	testsMaximum(40,30,"test maximum 40 archivos y 30 threads");
 }
 
 int main(int argc, char * argv[]) {

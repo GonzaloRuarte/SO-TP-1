@@ -20,10 +20,10 @@ class ConcurrentHashMap {
 		uint maxCount;
 		uint addCount;
 
-		atomic_int archivoADesencolar;
-
 	public:
 		Lista<pair<string,int> > tabla[26];
+		atomic<int> indiceADesencolarCountWords3;
+		atomic<int> indiceADesencolarCountWords5;
 
 		ConcurrentHashMap();
 
