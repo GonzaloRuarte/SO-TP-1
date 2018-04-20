@@ -6,6 +6,8 @@
 #include <list>
 #include <fstream>
 #include <vector>
+#include <atomic>
+
 
 using namespace std;
 class ConcurrentHashMap {
@@ -20,8 +22,6 @@ class ConcurrentHashMap {
 
 		uint maxCount;
 		uint addCount;
-
-		atomic_int archivoADesencolar;
 
 	public:
 		Lista<pair<string,int> > tabla[26];

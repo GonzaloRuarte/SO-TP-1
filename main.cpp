@@ -133,7 +133,7 @@ void testsMaximum(int cantArch, int cantThreads,string salida ){
 }
 
 void test6() {
-	testsMaximum(40,9,"test maximum 40 archivos y 30 threads");
+	testsMaximum(40,30,"test maximum 40 archivos y 30 threads");
 }
 
 int main(int argc, char * argv[]) {

@@ -218,7 +218,7 @@ void* procesarTextoCount5(void* mod) {
 	while(index<args->v->size()){
 		index=args->archivoADesencolar->fetch_add(1);
 		if(index<args->v->size()){
-			ConcurrentHashMap* h = count_words(args->archivo);
+			ConcurrentHashMap* h = ConcurrentHashMap::count_words(args->v->at(index));
 
 			for(int i = 0; i<26; ++i) {
 				for(auto it = h->tabla[i].CrearIt(); it.HaySiguiente(); it.Avanzar()) {
@@ -272,6 +272,7 @@ ConcurrentHashMap* ConcurrentHashMap::count_words(list<string> archs) {
 
 ConcurrentHashMap* ConcurrentHashMap::count_words(unsigned int n, list<string> archs) {
 	ConcurrentHashMap* h = new ConcurrentHashMap();
+	atomic_int archivoADesencolar(0);
 	vector<string> v{make_move_iterator(begin(archs)), make_move_iterator(end(archs))};
 	pthread_t threads[n];
 	sCountWords3 argAPasar[n];
@@ -279,7 +280,7 @@ ConcurrentHashMap* ConcurrentHashMap::count_words(unsigned int n, list<string> a
 	for (int tid = 0; tid < n; ++tid) {
 		argAPasar[tid].h = h;
 		argAPasar[tid].v = &v;
-		argAPasar[tid].archivoADesencolar = &(this->archivoADesencolar);
+		argAPasar[tid].archivoADesencolar = &(archivoADesencolar);
 		pthread_create(&threads[tid], NULL, procesarTextoCount3, &argAPasar[tid]);
 		
 	}
@@ -293,14 +294,15 @@ ConcurrentHashMap* ConcurrentHashMap::count_words(unsigned int n, list<string> a
 
 pair<string, unsigned int> ConcurrentHashMap::maximum5(unsigned int p_archivos, unsigned int p_maximos, list<string> archs) {
 	ConcurrentHashMap* mergedH = new ConcurrentHashMap();
+	atomic_int archivoADesencolar(0);
 	pthread_t threads[p_archivos];
 	vector<string> v{make_move_iterator(begin(archs)), make_move_iterator(end(archs))};
-	sCountWords3 argAPasar[p_archivos];
+	sCountWords5 argAPasar[p_archivos];
 
 	for (int tid = 0; tid < p_archivos; ++tid) {
-		argAPasar[tid].h = h;
+		argAPasar[tid].mergedH = mergedH;
 		argAPasar[tid].v = &v;
-		argAPasar[tid].archivoADesencolar = &(this->archivoADesencolar);
+		argAPasar[tid].archivoADesencolar = &(archivoADesencolar);
 		pthread_create(&threads[tid], NULL, procesarTextoCount5, &argAPasar[tid]);
 		
 	}
